@@ -17,6 +17,7 @@
     <p>
         <a href="{{ route('viewInterOffice', $document->docslip_id) }}" style="color: #1a73e8; text-decoration: none;">
             Click here to view the document
+            
         </a>
     </p>
 
