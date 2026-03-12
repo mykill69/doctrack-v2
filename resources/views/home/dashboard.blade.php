@@ -133,7 +133,17 @@
             </div>
         </section>
     </div>
-
+    @if (auth()->user()->dpa === null || auth()->user()->dpa == 0)
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                $('#dataPrivacy').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                $('#dataPrivacy').modal('show');
+            });
+        </script>
+    @endif
 
     <!-- Page Specific JS File -->
 @endsection

@@ -15,7 +15,7 @@
 
 
     <p>
-        <a href="{{ url('slip-monitoring/' . $document->docslip_id) }}" style="color: #1a73e8; text-decoration: none;">
+        <a href="{{ route('viewInterOffice', $document->docslip_id) }}" style="color: #1a73e8; text-decoration: none;">
             Click here to view the document
         </a>
     </p>

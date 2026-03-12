@@ -381,6 +381,21 @@ public function routingPending()
         return redirect()->route('usersView')->with('success', 'User updated successfully');
     }
 
+    public function updateDpa(Request $request)
+{
+    /** @var \App\Models\User $user */
+    $user = auth()->user();
+
+    if (!$user) {
+        return response()->json(['error' => 'Unauthenticated'], 401);
+    }
+
+    $user->dpa = $request->dpa === null ? null : 1;
+    $user->save();
+
+    return response()->json(['message' => 'DPA status updated.']);
+}
+
 
     public function logsView()
     {

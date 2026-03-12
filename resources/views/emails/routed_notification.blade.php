@@ -17,8 +17,10 @@ This is to inform you that a document has been forwarded for your
 </p>
 
 <p>
-<a href="{{ url('tracking?route_id=' . $document->rslip_id) }}"
-style="color:#1a73e8;text-decoration:none;font-weight:bold;">
+{{-- <a href="{{ url('tracking?route_id=' . $document->rslip_id) }}"
+style="color:#1a73e8;text-decoration:none;font-weight:bold;"> --}}
+<a href="{{ route('routingTimeline', $document->rslip_id) }}?slip_id={{ $document->rslip_id }}"
+   style="color:#1a73e8;text-decoration:none;font-weight:bold;">
 Click here to view the document
 </a>
 </p>

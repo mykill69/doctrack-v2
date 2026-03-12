@@ -103,6 +103,7 @@ Route::group(['middleware'=>['login_auth']],function(){
     Route::post('/users/create', [PagesController::class, 'createUser'])->name('createUser');
     Route::put('/users/edit/{id}', [PagesController::class, 'userEdit'])->name('userEdit');
     Route::post('/users/Group', [PagesController::class, 'addGroup'])->name('users.addGroup');
+    Route::post('/update-dpa', [PagesController::class, 'updateDpa'])->name('update.dpa');
 
 
     // Distribution list PDF
