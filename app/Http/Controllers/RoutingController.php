@@ -116,26 +116,6 @@ public function addRoutingPersonnel(Request $request)
         'transaction_type' => $slip->transaction_type,
     ]);
 
-    // ================= LOGS_TRANS (ONE PER USER) =================
-    // foreach ($userIds as $userId) {
-    //     LogsTrans::create([
-    //         'slip_id'        => $slip->id,
-    //         'rslip_id'       => $slip->rslip_id,
-    //         'creator_id'     => auth()->id(),
-    //         'source'         => $slip->source,
-    //         'subject'        => $slip->subject,
-    //         'trans_remarks'  => null,
-    //         'other_remarks'  => null,
-    //         'ass_comment'    => null,
-    //         'r_users'        => $userId,     // ✅ ONE USER PER ROW
-    //         'reassigned_to'  => null,
-    //         'file'           => $slip->file,
-    //         'purge_status'           => null,
-    //         'trans_status'   => 1,            // ✅ PERSONNEL STATUS
-    //         'date_received'  => $slip->date_received,
-    //          'transaction_type' => $slip->transaction_type,
-    //     ]);
-    // }
     foreach ($userIds as $userId) {
 
     LogsTrans::create([
