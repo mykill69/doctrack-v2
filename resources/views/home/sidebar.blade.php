@@ -157,6 +157,9 @@
                         <span>Document for Action</span>
                     </a>
                     <ul class="dropdown-menu">
+                        <li class="{{ request()->routeIs('routingToPres') ? 'active show' : '' }}">
+                            <a class="nav-link" href="{{ route('routingToPres') }}">Routed To President</a>
+                        </li>
                         <li class="{{ request()->routeIs('routing') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ route('routing') }}">Routed Back To Records</a>
                         </li>

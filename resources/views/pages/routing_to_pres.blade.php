@@ -96,13 +96,18 @@
                                                    <td>
                                                        <div class="buttons">
 
-                                                           <a href="{{ route('editRoutingPres', ['id' => $doc->id]) }}"
-                                                               class="btn btn-icon btn-success edit-slip-btn"><i
-                                                                   class="fas fa-pen"></i>
+                                                           {{-- Edit Button --}}
+                                                           <a href="{{ auth()->user()->role == 'super_admin' ? route('editRoutingPres', ['id' => $doc->id]) : '#' }}"
+                                                               class="btn btn-icon btn-success {{ auth()->user()->role != 'super_admin' ? 'disabled' : '' }}">
+                                                               <i class="fas fa-pen"></i>
                                                            </a>
 
-                                                           <a href="#" class="btn btn-icon btn-danger"><i
-                                                                   class="fas fa-trash"></i></a>
+                                                           {{-- Delete Button --}}
+                                                           <a href="#"
+                                                               class="btn btn-icon btn-danger {{ auth()->user()->role != 'super_admin' ? 'disabled' : '' }}">
+                                                               <i class="fas fa-trash"></i>
+                                                           </a>
+
                                                        </div>
                                                    </td>
 
