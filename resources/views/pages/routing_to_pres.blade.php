@@ -107,7 +107,6 @@
                                                                class="btn btn-icon btn-danger {{ auth()->user()->role != 'super_admin' ? 'disabled' : '' }}">
                                                                <i class="fas fa-trash"></i>
                                                            </a>
-
                                                        </div>
                                                    </td>
 
