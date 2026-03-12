@@ -15,12 +15,11 @@
 
 
     <p>
-        <a href="{{ route('viewInterOffice', $document->docslip_id) }}" style="color: #1a73e8; text-decoration: none;">
+        <a href="{{ route('viewInterOffice', ['id' => $document->track_slip]) }}"
+            style="color:#1a73e8; text-decoration:none; font-weight:bold;">
             Click here to view the document
-            
         </a>
     </p>
-
     <p style="margin-top: 25px;">
         Very truly yours,<br><br>
         {{ $document->user_name }}<br>
