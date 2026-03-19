@@ -8,6 +8,7 @@ use App\Http\Controllers\RoutingTimelineController;
 use App\Http\Controllers\ViewFilePdfController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\InterOfficeController;
+use App\Http\Controllers\PrintController;
 
 /*
 |--------------------------------------------------------------------------
@@ -136,6 +137,11 @@ Route::group(['middleware'=>['login_auth']],function(){
     Route::get('/archive-logbook', [ArchiveController::class, 'archiveLogbook'])->name('archiveLogbook');
     Route::get('/archived-history', [ArchiveController::class, 'archivedHistory'])->name('archivedHistory');
     Route::post('/archive-logbook/archive', [ArchiveController::class, 'archiveByYear'])->name('archiveLogbook.archive');
+
+    // Print Logbook
+    Route::get('/print-logbook', [PrintController::class, 'printLogbook'])->name('printLogbook');
+    Route::get('/print-logbook/pdf', [PrintController::class, 'logbookPdf'])->name('logbookPdf');
+
 
     //logout
     Route::get('/logout', [LoginAuthController::class, 'logout'])->name('logout');

@@ -73,7 +73,11 @@
                 </li>
 
                 {{-- Print Logbook --}}
-                <li><a class="nav-link" href="blank.html"><i class="fas fa-print"></i> <span>Print Logbook</span></a>
+                <li class="{{ request()->routeIs('printLogbook') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('printLogbook') }}">
+                        <i class="fas fa-print"></i>
+                        <span>Print Logbook</span>
+                    </a>
                 </li>
 
                 {{-- Audit Trail & Logs --}}
@@ -122,7 +126,11 @@
                 </li>
 
                 {{-- Print Logbook --}}
-                <li><a class="nav-link" href="blank.html"><i class="fas fa-print"></i> <span>Print Logbook</span></a>
+                <li class="{{ request()->routeIs('printLogbook') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('printLogbook') }}">
+                        <i class="fas fa-print"></i>
+                        <span>Print Logbook</span>
+                    </a>
                 </li>
 
                 {{-- Audit Trail & Logs --}}
@@ -181,7 +189,11 @@
                 </li>
 
                 {{-- Print Logbook --}}
-                <li><a class="nav-link" href="blank.html"><i class="fas fa-print"></i> <span>Print Logbook</span></a>
+                <li class="{{ request()->routeIs('printLogbook') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('printLogbook') }}">
+                        <i class="fas fa-print"></i>
+                        <span>Print Logbook</span>
+                    </a>
                 </li>
 
 
