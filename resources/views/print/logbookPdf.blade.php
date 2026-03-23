@@ -124,8 +124,6 @@
                         </td>
 
                         <td>{{ $row->source ?? 'N/A' }}</td>
-
-                        {{-- SUBJECT (truncate to avoid overflow) --}}
                         @php
                             $subject = $row->subject ?? 'N/A';
                             $words = explode(' ', $subject);
@@ -144,12 +142,9 @@
                             @endif
                         </td>
 
-
                         <td>
                             {{ $row->updated_at ? $row->updated_at->format('M d, Y') : 'N/A' }}
                         </td>
-
-
 
                         <td>
                             @php
@@ -171,15 +166,12 @@
                             @endif
                         </td>
 
-
-
                         <td>{{ $row->created_at->format('m-d-Y h:i:s A') }}</td>
                         <td>{{ $row->trans_remarks ?? ' ' }}</td>
                         <td>&nbsp;</td>
                     </tr>
                 @endforeach
 
-                {{-- FILL EMPTY ROWS TO KEEP 15 PER PAGE --}}
                 @for ($i = count($chunk); $i < $rowsPerPage; $i++)
                     <tr>
                         <td>&nbsp;</td>
@@ -206,4 +198,4 @@
 </body>
 
 </html>
-``
+

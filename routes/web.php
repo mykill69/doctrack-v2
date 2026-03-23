@@ -9,6 +9,7 @@ use App\Http\Controllers\ViewFilePdfController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\InterOfficeController;
 use App\Http\Controllers\PrintController;
+use App\Http\Controllers\EnduserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -105,6 +106,17 @@ Route::group(['middleware'=>['login_auth']],function(){
     Route::put('/users/edit/{id}', [PagesController::class, 'userEdit'])->name('userEdit');
     Route::post('/users/Group', [PagesController::class, 'addGroup'])->name('users.addGroup');
     Route::post('/update-dpa', [PagesController::class, 'updateDpa'])->name('update.dpa');
+
+    // End user pages
+    
+    Route::get('/user-password/{id}', [EnduserController::class, 'userPassword'])->name('userPassword');
+    Route::put('/pass-password/{id}', [EnduserController::class, 'passChange'])->name('passChange');
+
+    
+    Route::get('/esignature/{user}', [EnduserController::class, 'showEsig'])
+        ->name('esig.show')
+        ->middleware('auth');
+
 
 
     // Distribution list PDF

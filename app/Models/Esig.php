@@ -9,11 +9,14 @@ class Esig extends Model
 {
     use HasFactory;
 
-     protected $table = 'esig';
+    
+    protected $table = 'esig';
 
-    // Define which fields are mass assignable
     protected $fillable = [
         'user_id',
         'esig_file',
+        'esig_mime',
+        'esig_ext',
     ];
 }
+

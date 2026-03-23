@@ -116,17 +116,26 @@
                             </div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            {{-- <div class="dropdown-title">Logged in 5 min ago</div> --}}
-                            <a href="features-profile.html" class="dropdown-item has-icon"><i class="far fa-user"></i>
+
+                            <div class="dropdown-title">
+                                @if ($lastLogin)
+                                    Logged in {{ $lastLogin->created_at->diffForHumans() }}
+                                @else
+                                    Logged in just now
+                                @endif
+                            </div>
+
+                            <a href="{{ route('userPassword', ['id' => Auth::user()->id]) }}" class="dropdown-item has-icon"><i class="far fa-user"></i>
                                 Profile</a>
 
                             <a href="features-settings.html" class="dropdown-item has-icon" data-toggle="modal"
                                 data-target="#aboutDts"><i class="fas fa-info-circle"></i>
                                 About DTS</a>
                             <a href="features-activities.html" class="dropdown-item has-icon" data-toggle="modal"
-                                data-target="#dataPrivacy"><i
-                                    class="fas fa-scroll"></i> Terms & Conditions</a>
-                            <div class="dropdown-divider"></div>
+                                data-target="#dataPrivacy"><i class="fas fa-scroll"></i> Terms & Conditions</a>
+                            <a href="#" class="dropdown-item has-icon"><i
+                                    class="fas fa-code-branch nav-icon"></i> System Version 2.0.0</a>
+                            {{-- <div class="dropdown-divider"></div> --}}
                             <a href="{{ route('logout') }}" class="dropdown-item has-icon text-danger"><i
                                     class="fas fa-sign-out-alt"></i> Logout</a>
                         </div>

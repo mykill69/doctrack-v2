@@ -12,6 +12,8 @@ use App\Models\RoutingSlip;
 use App\Models\RoutingPdf;
 use App\Models\ReassignedUser;
 use App\Models\Esig;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Crypt;
 
 class ViewFilePdfController extends Controller
 {
@@ -158,163 +160,178 @@ class ViewFilePdfController extends Controller
 
 public function pdfSlip($slipId)
 {
-$user = auth()->user();
-$userId = $user->id;
+    $user = auth()->user();
+    $userId = $user->id;
 
-$slip = RoutingSlip::findOrFail($slipId);
+    $slip = RoutingSlip::findOrFail($slipId);
 
-// --- Get RoutingPdf entries ---
-$routingPdfs = RoutingPdf::where('routing_slip_id', $slip->id)
-    ->when($userId != 56, function($query) use ($userId) {
-        $query->where(function($q) use ($userId) {
-            $q->where('creator_id', $userId)
-              ->orWhere('reassigned_to', $userId)
-              ->orWhereRaw("FIND_IN_SET(?, routed_users)", [$userId]);
-        });
-    })
-    ->orderBy('id', 'asc')
-    ->get();
+    // --- Get RoutingPdf entries ---
+    $routingPdfs = RoutingPdf::where('routing_slip_id', $slip->id)
+        ->when($userId != 56, function($query) use ($userId) {
+            $query->where(function($q) use ($userId) {
+                $q->where('creator_id', $userId)
+                  ->orWhere('reassigned_to', $userId)
+                  ->orWhereRaw("FIND_IN_SET(?, routed_users)", [$userId]);
+            });
+        })
+        ->orderBy('id', 'asc')
+        ->get();
 
-// --- Get ReassignedUser entries ---
-$reassignedUsers = ReassignedUser::where('slip_id', $slip->id)
-    ->when($userId != 56, fn($q) => $q->where('reassigned_id', $userId))
-    ->orderBy('id', 'asc')
-    ->get();
+    // --- Get ReassignedUser entries ---
+    $reassignedUsers = ReassignedUser::where('slip_id', $slip->id)
+        ->when($userId != 56, fn($q) => $q->where('reassigned_id', $userId))
+        ->orderBy('id', 'asc')
+        ->get();
 
-// --- Prepare PDF data ---
-$pdfData = collect();
+    $pdfData = collect();
+    $addedEntries = [];
 
-// Track already added entries to avoid duplicates
-$addedEntries = [];
+    // --- Loop RoutingPdf entries ---
+    foreach ($routingPdfs as $routingPdf) {
 
-// --- Loop RoutingPdf entries ---
-foreach ($routingPdfs as $routingPdf) {
-    $key = 'pdf_' . $routingPdf->id;
-    if (in_array($key, $addedEntries)) continue;
-    $addedEntries[] = $key;
-
-    $departments = collect();
-    $fromType = null;
-    $toText = '';
-    $dateText = '';
-
-    $routedUserIds = collect(explode(',', $routingPdf->routed_users))
-        ->map(fn($id) => trim($id))
-        ->filter()
-        ->toArray();
-
-    $isAdminOrRecords = in_array($user->role, ['Administrator', 'records_officer']);
-    $isRoutedUser = in_array((string)$user->id, $routedUserIds);
-
-    $reassignedEntry = $reassignedUsers->first(fn($ru) => $ru->reassigned_id == $user->id);
-    $isReassignedUser = !is_null($reassignedEntry);
-
-    if ($userId == 56 || $isAdminOrRecords || $isRoutedUser) {
-        $departments->push(['type' => 'pres', 'value' => $routingPdf->pres_dept]);
-        $fromType = 'pres';
-    } elseif ($isReassignedUser) {
-        $creator = User::find($reassignedEntry->creator_id);
-        if ($creator) {
-            $departments->push(['type' => 'reassigned', 'value' => $creator->department]);
-            $fromType = 'reassigned';
-        }
-    }
-
-    // TO + DATE
-    if ($fromType === 'pres') {
-        $users = User::whereIn('id', $routedUserIds)->get();
-        $toText = $users->map(fn($u) => $u->fname . ' ' . $u->lname)->implode(', ');
-        $dateText = $routingPdf->created_at->format('m/d/Y');
-    } elseif ($fromType === 'reassigned' && $reassignedEntry) {
-        $assignedUser = User::find($reassignedEntry->reassigned_id);
-        $toText = $assignedUser ? $assignedUser->fname . ' ' . $assignedUser->lname : '';
-        $dateText = $reassignedEntry->created_at->format('m/d/Y');
-    }
-
-    $departments = $departments->unique(fn($item) => $item['type'] . $item['value']);
-
-    // Signatory
-    $signatoryName = 'ALADINO C. MORACA, Ph.D.';
-    $signatoryTitle = 'SUC President';
-    $isReassignedFrom = false;
-
-    if ($fromType === 'reassigned' && $reassignedEntry) {
-        $creator = User::find($reassignedEntry->creator_id);
-        if ($creator) {
-            $signatoryName = $creator->fname . ' ' . $creator->lname;
-            $signatoryTitle = $creator->department;
-            $isReassignedFrom = true;
-        }
-    }
-
-    $esigUserId = $isReassignedFrom && isset($creator) ? $creator->id : 38;
-    $signatoryEsig = Esig::where('user_id', $esigUserId)->first();
-    if ($signatoryEsig && $signatoryEsig->esig_file) {
-        $signatoryEsig->esig_path = public_path('storage/esignature/' . $signatoryEsig->esig_file);
-    }
-
-    $pdfData->push([
-        'routingPdf' => $routingPdf,
-        'departments' => $departments,
-        'toText' => $toText,
-        'dateText' => $dateText,
-        'signatoryName' => $signatoryName,
-        'signatoryTitle' => $signatoryTitle,
-        'signatoryEsig' => $signatoryEsig,
-    ]);
-}
-
-// --- Loop ReassignedUser entries (only for 56, skip if already in RoutingPdf) ---
-if ($userId == 56) {
-    foreach ($reassignedUsers as $reassigned) {
-        // Skip if this ReassignedUser is already represented in a RoutingPdf
-        $alreadyInPdf = $routingPdfs->contains(function($pdf) use ($reassigned) {
-            return $pdf->creator_id == $reassigned->creator_id
-                && $pdf->reassigned_to == $reassigned->reassigned_id;
-        });
-        if ($alreadyInPdf) continue;
-
-        $key = 'reassign_' . $reassigned->id;
+        $key = 'pdf_' . $routingPdf->id;
         if (in_array($key, $addedEntries)) continue;
         $addedEntries[] = $key;
 
-        $creator = $reassigned->creator;
-        $assignedUser = $reassigned->reassignedUser;
+        $departments = collect();
+        $fromType = null;
+        $toText = '';
+        $dateText = '';
 
-        $departments = collect([['type' => 'reassigned', 'value' => $creator->department]]);
-        $toText = $assignedUser ? $assignedUser->fname . ' ' . $assignedUser->lname : '';
-        $dateText = $reassigned->created_at->format('m/d/Y');
+        $routedUserIds = collect(explode(',', $routingPdf->routed_users))
+            ->map(fn($id) => trim($id))
+            ->filter()
+            ->toArray();
 
-        $signatoryName = $creator->fname . ' ' . $creator->lname;
-        $signatoryTitle = $creator->department;
-        $esigUserId = $creator->id;
-        $signatoryEsig = Esig::where('user_id', $esigUserId)->first();
-        if ($signatoryEsig && $signatoryEsig->esig_file) {
-            $signatoryEsig->esig_path = public_path('storage/esignature/' . $signatoryEsig->esig_file);
+        $isAdminOrRecords = in_array($user->role, ['Administrator', 'records_officer']);
+        $isRoutedUser = in_array((string)$user->id, $routedUserIds);
+
+        $reassignedEntry = $reassignedUsers->first(fn($ru) => $ru->reassigned_id == $user->id);
+        $isReassignedUser = !is_null($reassignedEntry);
+
+        if ($userId == 56 || $isAdminOrRecords || $isRoutedUser) {
+            $departments->push(['type' => 'pres', 'value' => $routingPdf->pres_dept]);
+            $fromType = 'pres';
+        } elseif ($isReassignedUser) {
+            $creator = User::find($reassignedEntry->creator_id);
+            if ($creator) {
+                $departments->push(['type' => 'reassigned', 'value' => $creator->department]);
+                $fromType = 'reassigned';
+            }
         }
 
+        // TO + DATE
+        if ($fromType === 'pres') {
+            $users = User::whereIn('id', $routedUserIds)->get();
+            $toText = $users->map(fn($u) => $u->fname . ' ' . $u->lname)->implode(', ');
+            $dateText = $routingPdf->created_at->format('m/d/Y');
+        } elseif ($fromType === 'reassigned' && $reassignedEntry) {
+            $assignedUser = User::find($reassignedEntry->reassigned_id);
+            $toText = $assignedUser ? $assignedUser->fname . ' ' . $assignedUser->lname : '';
+            $dateText = $reassignedEntry->created_at->format('m/d/Y');
+        }
+
+        $departments = $departments->unique(fn($item) => $item['type'] . $item['value']);
+
+        // --- Signatory ---
+        $signatoryName = 'ALADINO C. MORACA, Ph.D.';
+        $signatoryTitle = 'SUC President';
+        $isReassignedFrom = false;
+
+        if ($fromType === 'reassigned' && $reassignedEntry) {
+            $creator = User::find($reassignedEntry->creator_id);
+            if ($creator) {
+                $signatoryName = $creator->fname . ' ' . $creator->lname;
+                $signatoryTitle = $creator->department;
+                $isReassignedFrom = true;
+            }
+        }
+
+        $esigUserId = $isReassignedFrom && isset($creator) ? $creator->id : 38;
+
+        $signatoryEsig = Esig::where('user_id', $esigUserId)->first();
+
+        // ✅ NEW: Convert encrypted file to base64
+        $esigBase64 = $this->getEsigBase64($signatoryEsig);
+
         $pdfData->push([
-            'routingPdf' => null,
+            'routingPdf' => $routingPdf,
             'departments' => $departments,
             'toText' => $toText,
             'dateText' => $dateText,
             'signatoryName' => $signatoryName,
             'signatoryTitle' => $signatoryTitle,
-            'signatoryEsig' => $signatoryEsig,
+            'signatoryEsig' => $esigBase64, // ✅ CHANGED
         ]);
     }
+
+    // --- Loop ReassignedUser entries ---
+    if ($userId == 56) {
+        foreach ($reassignedUsers as $reassigned) {
+
+            $alreadyInPdf = $routingPdfs->contains(function($pdf) use ($reassigned) {
+                return $pdf->creator_id == $reassigned->creator_id
+                    && $pdf->reassigned_to == $reassigned->reassigned_id;
+            });
+
+            if ($alreadyInPdf) continue;
+
+            $key = 'reassign_' . $reassigned->id;
+            if (in_array($key, $addedEntries)) continue;
+            $addedEntries[] = $key;
+
+            $creator = $reassigned->creator;
+            $assignedUser = $reassigned->reassignedUser;
+
+            $departments = collect([
+                ['type' => 'reassigned', 'value' => $creator->department]
+            ]);
+
+            $toText = $assignedUser ? $assignedUser->fname . ' ' . $assignedUser->lname : '';
+            $dateText = $reassigned->created_at->format('m/d/Y');
+
+            $signatoryName = $creator->fname . ' ' . $creator->lname;
+            $signatoryTitle = $creator->department;
+
+            $signatoryEsig = Esig::where('user_id', $creator->id)->first();
+
+            // ✅ NEW
+            $esigBase64 = $this->getEsigBase64($signatoryEsig);
+
+            $pdfData->push([
+                'routingPdf' => null,
+                'departments' => $departments,
+                'toText' => $toText,
+                'dateText' => $dateText,
+                'signatoryName' => $signatoryName,
+                'signatoryTitle' => $signatoryTitle,
+                'signatoryEsig' => $esigBase64, // ✅ CHANGED
+            ]);
+        }
+    }
+
+    $pdf = Pdf::loadView('pdf.pdfSlip', [
+        'slip' => $slip,
+        'pdfData' => $pdfData
+    ])->setPaper('A4', 'portrait');
+
+    return $pdf->stream('routing-slip.pdf');
 }
 
-// --- Generate PDF ---
-$pdf = Pdf::loadView('pdf.pdfSlip', [
-    'slip' => $slip,
-    'pdfData' => $pdfData
-])->setPaper('A4', 'portrait');
+private function getEsigBase64($esig)
+{
+    if (!$esig || !$esig->esig_file) return null;
 
-return $pdf->stream('routing-slip.pdf');
+    try {
+        $ciphertext = Storage::disk('esignature')->get($esig->esig_file);
+        $raw = base64_decode(Crypt::decryptString($ciphertext));
+
+        return 'data:' . ($esig->esig_mime ?? 'image/png') . ';base64,' . base64_encode($raw);
+
+    } catch (\Exception $e) {
+        return null;
+    }
 }
-
-
 
 public function viewistListPres()
 {

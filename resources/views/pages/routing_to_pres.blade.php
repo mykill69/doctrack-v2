@@ -97,14 +97,14 @@
                                                        <div class="buttons">
 
                                                            {{-- Edit Button --}}
-                                                           <a href="{{ auth()->user()->role == 'super_admin' ? route('editRoutingPres', ['id' => $doc->id]) : '#' }}"
-                                                               class="btn btn-icon btn-success {{ auth()->user()->role != 'super_admin' ? 'disabled' : '' }}">
+                                                           <a href="{{ auth()->user()->role == 'super_user' ? route('editRoutingPres', ['id' => $doc->id]) : '#' }}"
+                                                               class="btn btn-icon btn-success {{ auth()->user()->role != 'super_user' ? 'disabled' : '' }}">
                                                                <i class="fas fa-pen"></i>
                                                            </a>
 
                                                            {{-- Delete Button --}}
                                                            <a href="#"
-                                                               class="btn btn-icon btn-danger {{ auth()->user()->role != 'super_admin' ? 'disabled' : '' }}">
+                                                               class="btn btn-icon btn-danger {{ auth()->user()->role != 'super_user' ? 'disabled' : '' }}">
                                                                <i class="fas fa-trash"></i>
                                                            </a>
                                                        </div>

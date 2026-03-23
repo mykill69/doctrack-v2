@@ -36,65 +36,7 @@
                 </div>
             </div>
 
-            <div class="modal-footer flex-column align-items-start px-4">
-
-                <div class="form-check mb-3">
-                    <input type="checkbox" class="form-check-input" id="dpaCheckbox">
-                    <label class="form-check-label" for="dpaCheckbox">
-                        <i>I understand and agree to the Data Privacy Notice and consent to the use of my personal data.</i>
-                    </label>
-                </div>
-
-                <div>
-                    <button class="btn btn-success" id="acceptBtn" disabled>
-                        Accept
-                    </button>
-
-                    <button class="btn btn-danger" id="declineBtn">
-                        Decline & Sign Out
-                    </button>
-                </div>
-
-            </div>
 
         </div>
     </div>
 </div>
-
-<script>
-
-document.getElementById('dpaCheckbox').addEventListener('change', function () {
-    document.getElementById('acceptBtn').disabled = !this.checked;
-});
-
-document.getElementById('acceptBtn').addEventListener('click', function () {
-    updateDpaStatus(1);
-});
-
-document.getElementById('declineBtn').addEventListener('click', function () {
-    window.location.href = "{{ route('logout') }}";
-});
-
-function updateDpaStatus(status) {
-
-    fetch("{{ route('update.dpa') }}", {
-        method: "POST",
-        headers: {
-            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            dpa: status
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-
-        $('#dataPrivacy').modal('hide');
-        location.reload();
-
-    });
-
-}
-
-</script>

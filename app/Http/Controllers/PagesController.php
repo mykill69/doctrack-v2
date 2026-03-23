@@ -404,7 +404,7 @@ public function routingPending()
             ->get();
 
         $offices = Office::orderBy('office_name', 'asc')->get();
-    $userId = auth()->id();
+        $userId = auth()->id();
         $role   = auth()->user()->role;
 
         // Pending Count
@@ -413,6 +413,7 @@ public function routingPending()
             ->when(in_array($role, ['Administrator', 'records_officer']), fn($q) => $q->where(fn($q2) => $q2->where('creator_id', $userId)->orWhere('r_users', 'LIKE', "%{$userId}%")))
             ->orderBy('date_received', 'desc')
             ->get();
+            
 
         $pendingCount = $pendingLogs->groupBy('slip_id')->count();
         return view('logs.all_logs', [

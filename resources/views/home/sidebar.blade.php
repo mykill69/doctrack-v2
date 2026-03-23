@@ -134,7 +134,7 @@
                 </li>
 
                 {{-- Audit Trail & Logs --}}
-                <li class="dropdown">
+                {{-- <li class="dropdown">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
                             class="fas fa-clock-rotate-left"></i>
                         <span>Audit Trail & Logs</span></a>
@@ -142,7 +142,7 @@
                         <li><a href="gmaps-advanced-route.html">Transaction Logs</a></li>
                         <li><a href="gmaps-draggable-marker.html">Management Logs</a></li>
                     </ul>
-                </li>
+                </li> --}}
             @endif
 
             {{-- ================= Sidebar for Admin / Records Officer ================= --}}

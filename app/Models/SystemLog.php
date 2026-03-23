@@ -12,7 +12,7 @@ class SystemLog extends Model
     protected $fillable = [
     'user_id',
     'action',
-    'action_type', // <-- new column
+    'action_type',
     'ip_address',
     'user_agent',
 ];

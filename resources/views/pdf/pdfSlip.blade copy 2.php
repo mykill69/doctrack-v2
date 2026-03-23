@@ -284,9 +284,10 @@
                         <table style="text-align:center;width: 100%;">
                             <tr>
                                 {{-- E-SIGNATURE --}}
-                                @if (!empty($data['signatoryEsig']))
+                                @if ($data['signatoryEsig'] && isset($data['signatoryEsig']->esig_path))
                                     <div style="margin-bottom: -6%;">
-                                        <img src="{{ $data['signatoryEsig'] }}" style="height:70px;">
+                                        <img src="{{ $data['signatoryEsig']->esig_path }}" alt="Electronic Signature"
+                                            style="height:70px;">
                                     </div>
                                 @endif
 
