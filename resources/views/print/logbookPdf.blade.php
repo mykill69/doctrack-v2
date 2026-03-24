@@ -116,58 +116,66 @@
 
             <tbody>
                 @foreach ($chunk as $row)
+                    @php $isCompleted = $row->routing_status == 3; @endphp
                     <tr>
+                        {{-- ALWAYS SHOW --}}
                         <td>{{ $row->rslip_id }}</td>
 
+                        @php $isCompleted = $row->routing_status == 3; @endphp
+
                         <td>
-                            {{ $row->date_received ? \Carbon\Carbon::parse($row->date_received)->format('M d, Y') : 'N/A' }}
+                            {{ $isCompleted && $row->date_received ? \Carbon\Carbon::parse($row->date_received)->format('M d, Y') : '' }}
                         </td>
 
-                        <td>{{ $row->source ?? 'N/A' }}</td>
+                        <td>{{ $isCompleted ? $row->source ?? '' : '' }}</td>
+
                         @php
-                            $subject = $row->subject ?? 'N/A';
+                            $subject = $row->subject ?? '';
                             $words = explode(' ', $subject);
                             if (count($words) > 80) {
                                 $subject = implode(' ', array_slice($words, 0, 80)) . '...';
                             }
                         @endphp
-                        <td>{{ $subject }}</td>
-
+                        <td>{{ $isCompleted ? $subject : '' }}</td>
 
                         <td>
-                            @if ($row->transaction_type == 1)
-                                Dr. Aladino C. Moraca
-                            @elseif ($row->transaction_type == 2)
-                                &nbsp;
+                            @if ($isCompleted)
+                                @if ($row->transaction_type == 1)
+                                    Dr. Aladino C. Moraca
+                                @elseif ($row->transaction_type == 2)
+                                    {{ $row->creator->fname . ' ' . $row->creator->lname }}
+                                @endif
                             @endif
                         </td>
 
                         <td>
-                            {{ $row->updated_at ? $row->updated_at->format('M d, Y') : 'N/A' }}
+                            {{ $isCompleted && $row->updated_at ? $row->updated_at->format('M d, Y') : '' }}
                         </td>
 
                         <td>
-                            @php
-                                $routedUser = $users[$row->routed_users] ?? null;
-                                $reassignedUser = $users[$row->reassigned_to] ?? null;
-                            @endphp
+                            @if ($isCompleted)
+                                @php
+                                    $routedUser = $users[$row->routed_users] ?? null;
+                                    $reassignedUser = $users[$row->reassigned_to] ?? null;
+                                @endphp
 
-                            {{-- Original routed user --}}
-                            @if ($routedUser)
-                               <strong> {{ $routedUser->fname . ' ' . $routedUser->lname }} </strong>
-                            @endif
+                                @if ($routedUser)
+                                    <strong>{{ $routedUser->fname . ' ' . $routedUser->lname }}</strong>
+                                @endif
 
-                            {{-- Re-assigned user --}}
-                            @if ($reassignedUser)
-                                , re-assigned to
-                                <strong>
-                                    {{ $reassignedUser->fname . ' ' . $reassignedUser->lname }}
-                                </strong>
+                                @if ($reassignedUser)
+                                    , re-assigned to
+                                    <strong>{{ $reassignedUser->fname . ' ' . $reassignedUser->lname }}</strong>
+                                @endif
                             @endif
                         </td>
 
-                        <td>{{ $row->created_at->format('m-d-Y h:i:s A') }}</td>
-                        <td>{{ $row->trans_remarks ?? ' ' }}</td>
+                        <td>
+                            {{ $isCompleted ? $row->created_at->format('m-d-Y h:i:s A') : '' }}
+                        </td>
+
+                        <td>{{ $isCompleted ? $row->trans_remarks ?? '' : '' }}</td>
+
                         <td>&nbsp;</td>
                     </tr>
                 @endforeach
@@ -198,4 +206,3 @@
 </body>
 
 </html>
-

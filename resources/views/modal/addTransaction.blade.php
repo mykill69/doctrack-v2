@@ -45,7 +45,7 @@
                                     <select class="form-control" name="transaction_type" id="transactionType" required>
                                         <option value="">Select Transaction Type</option>
 
-                                        @if (!in_array(auth()->user()->id, [20, 56]))
+                                        @if (!in_array(auth()->user()->id, [20, 56, 1236]))
                                             {{-- Only show Personnel's Action --}}
                                             <option value="2">PERSONNEL's ACTION</option>
                                         @else
@@ -68,6 +68,31 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Document Type (only for user id 1235) -->
+                        @if (auth()->user()->id == 1235)
+                            <div class="form-group">
+                                <label class="font-weight-bold">Document Type</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </div>
+                                    </div>
+                                    <select name="purge_status" class="form-control" required>
+                                        <option value="">Select</option>
+                                        <option value="Issuance">Issuance</option>
+                                        <option value="Correspondence">Correspondence</option>
+                                        <option value="DPCR/IPCR">DPCR/IPCR</option>
+                                        <option value="PAPS-PRE">PAPS-PRE</option>
+                                        <option value="PPMP">PPMP</option>
+                                        <option value="Reimbursement">Reimbursement</option>
+                                        <option value="Travel Authority">Travel Authority</option>
+                                        <option value="Other Document">Other Document</option>
+                                    </select>
+                                </div>
+                            </div>
+                        @endif
 
                         <!-- Control Number & Date Received -->
                         <div class="form-group row">
@@ -126,7 +151,8 @@
                                 @if (!in_array(auth()->user()->role, ['super_user', 'staff']))
                                     <option disabled>— Select by Group —</option>
                                     @foreach ($groups as $group)
-                                        <option value="group:{{ $group->group_name }}">{{ $group->group_name }}</option>
+                                        <option value="group:{{ $group->group_name }}">{{ $group->group_name }}
+                                        </option>
                                     @endforeach
                                     <option disabled>──────────</option>
                                 @endif

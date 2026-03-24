@@ -76,6 +76,7 @@ public function addRoutingPersonnel(Request $request)
         'routed_users'   => 'required|array',
         'file'           => 'required|file',
         'validity'       => 'required|digits:4',
+        'purge_status'   => 'required|string',
     ]);
 
     // ================= FILE UPLOAD =================
@@ -103,6 +104,7 @@ public function addRoutingPersonnel(Request $request)
         'date_received'    => $request->date_received,
         'validity'         => $request->validity,
         'transaction_type' => $request->transaction_type,
+        'purge_status'     => $request->purge_status,
     ]);
 
     // ================= LOGS_ROUTE (ONE RECORD) =================
@@ -130,6 +132,7 @@ public function addRoutingPersonnel(Request $request)
         'r_users'        => $userId,
         'reassigned_to'  => null,
         'file'           => $slip->file,
+        'purge_status'     => $slip->purge_status,
         'purge_status'   => null,
         'trans_status'   => 1,
         'date_received'  => $slip->date_received,

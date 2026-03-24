@@ -74,9 +74,9 @@ public function logbookPdf(Request $request)
     }
 
     // ✅ Routing status
-    if ($request->filled('routing_status')) {
-        $query->where('routing_status', $request->routing_status);
-    }
+    // if ($request->filled('routing_status')) {
+    //     $query->where('routing_status', $request->routing_status);
+    // }
 
     // ✅ ACCESS CONTROL (IMPORTANT PART)
     $query->where(function ($q) use ($userId) {
@@ -84,9 +84,18 @@ public function logbookPdf(Request $request)
           ->orWhere('creator_id', $userId);
     });
 
+    // $routingSlips = $query
+    //     ->orderBy('op_ctrl')
+    //     ->get();
     $routingSlips = $query
-        ->orderBy('op_ctrl')
-        ->get();
+    ->where(function ($q) use ($userId) {
+        $q->where('routed_users', $userId)
+          ->orWhere('creator_id', $userId);
+    })
+    ->orderBy('op_ctrl')
+    ->get()
+    ->unique('rslip_id') // ✅ remove duplicates here
+    ->values(); // reindex
 
     $pdf = Pdf::loadView('print.logbookPdf', compact(
         'routingSlips',

@@ -30,7 +30,8 @@
                                             <th>REMARKS</th>
                                             <th>FILE NAME</th>
                                             <th>UPDATED DATE / BY</th>
-                                            <th>TOTAL DURATION</th>
+                                            {{-- <th>TOTAL DURATION</th> --}}
+                                            <th>ACTION</th>
                                         </tr>
                                     </thead>
 
@@ -115,12 +116,23 @@
                                                     {{ $log->updated_at->format('m-d-Y h:i:s A') ?? 'N/A' }}
                                                 </td>
 
-                                                <td>
+                                                {{-- <td>
                                                     @if ($log->created_at && $log->updated_at)
                                                         {{ \Carbon\Carbon::parse($log->created_at)->diffForHumans($log->updated_at, true) }}
                                                     @else
                                                         —
                                                     @endif
+                                                </td> --}}
+                                                <td>
+                                                    <div class="buttons">
+
+                                                        <a href="{{ route('editRecall', ['id' => $log->id]) }}"
+                                                            class="btn btn-icon btn-info edit-slip-btn" target="_blank"><span>Recall</span> <i
+                                                                class="fas fa-undo-alt"></i>
+                                                        </a>
+
+                                                       
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @endforeach

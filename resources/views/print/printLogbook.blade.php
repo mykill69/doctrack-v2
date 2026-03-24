@@ -31,17 +31,17 @@
                                     </div>
 
                                     <!-- Routing Status -->
-                                    <div class="col-md-3 mb-2">
+                                    {{-- <div class="col-md-3 mb-2">
                                         <select name="routing_status" class="form-control">
                                             <option value="">-- Select Routing Status --</option>
                                             <option value="1">Pending</option>
                                             <option value="2">In Progress</option>
                                             <option value="3">Completed</option>
                                         </select>
-                                    </div>
+                                    </div> --}}
 
                                     <!-- Print -->
-                                    <div class="col-md-3 mb-2">
+                                    <div class="col-md-1 mb-2">
                                         <button type="submit" class="btn btn-success w-100">
                                             <i class="fas fa-print"></i> Print
                                         </button>

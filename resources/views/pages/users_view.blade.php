@@ -33,7 +33,7 @@
                                                <th>OFFICE</th>
                                                <th>ROLE</th>
                                                <th>GROUP</th>
-                                               <th>DATE CREATED</th>
+                                               {{-- <th>DATE CREATED</th> --}}
                                                <th>ACTION</th>
                                            </tr>
                                        </thead>
@@ -70,9 +70,9 @@
                                                        @endif
                                                    </td>
 
-                                                   <td>
+                                                   {{-- <td>
                                                        {{ $user->created_at ? $user->created_at->format('F d, Y') : '—' }}
-                                                   </td>
+                                                   </td> --}}
 
                                                    <td>
                                                        <div class="dropdown">
