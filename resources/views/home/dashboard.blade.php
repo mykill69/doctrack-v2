@@ -127,7 +127,7 @@
                                                     <div class="buttons">
 
                                                         <a href="{{ route('editRecall', ['id' => $log->id]) }}"
-                                                            class="btn btn-icon btn-info edit-slip-btn" target="_blank"><span>Recall</span> <i
+                                                            class="btn btn-icon btn-info edit-slip-btn" target="_blank"><span>Recall Document</span> <i
                                                                 class="fas fa-undo-alt"></i>
                                                         </a>
 
