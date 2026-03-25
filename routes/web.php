@@ -11,6 +11,9 @@ use App\Http\Controllers\InterOfficeController;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\EnduserController;
 
+use Illuminate\Http\Request;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -58,6 +61,11 @@ Route::group(['middleware'=>['login_auth']],function(){
     // Inter-Office Transaction Page
     Route::get('/inter-office', [InterOfficeController::class, 'interOffice'])->name('interOffice');
     Route::post('/inter-office/store', [InterOfficeController::class, 'storeInterOffice'])->name('storeInterOffice');
+
+//     Route::post('/interoffice-loader', function (Request $request) {
+//     return view('loading.interofficeProcessing')->with(request()->all());
+// })->name('interoffice.loader');
+
     route::get('/inter-office/view/{id}', [InterOfficeController::class, 'viewInterOffice'])->name('viewInterOffice');
     Route::post('/inter-office/add-entry', [InterOfficeController::class, 'addEntry'])->name('interOffice.addEntry');
 
@@ -82,6 +90,14 @@ Route::group(['middleware'=>['login_auth']],function(){
     // Edit Transaction to be Route to Personnel
     Route::get('/routed-entry/edit-trans-entry/{id}', [RoutingController::class, 'editRoutingEntry'])->name('editRoutingEntry');
     Route::put('/routed-entry/update-trans-entry/{id}', [RoutingController::class, 'updateRoutingEntry'])->name('updateRoutingEntry');
+
+    Route::post('/routing-loader/{id}', function (Request $request, $id) {
+    return view('loading.routingProcessing', [
+        'slipEntry' => \App\Models\RoutingSlip::findOrFail($id)
+    ]);
+    })->name('routing.loader');
+
+
 
     // Recall Transaction from Personnel 
     Route::get('/routed-pending-entry/edit-recall/{id}', [RoutingController::class, 'editRecall'])->name('editRecall');

@@ -40,5 +40,9 @@ class AppServiceProvider extends ServiceProvider
             $view->with('lastLogin', $lastLogin);
         });
 
+        View::composer('*', function ($view) {
+        $view->with('users', User::orderBy('fname')->get());
+        $view->with('groups', Group::orderBy('group_name')->get());
+    });
           }
 }

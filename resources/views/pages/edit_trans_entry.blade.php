@@ -15,10 +15,11 @@
                            </div>
 
 
-                           <form action="{{ route('updateRoutingEntry', $slipEntry->id) }}" method="POST"
-                               enctype="multipart/form-data">
+                           {{-- <form action="{{ route('updateRoutingEntry', $slipEntry->id) }}" method="POST"
+                               enctype="multipart/form-data"> --}}
+                           <form action="{{ route('routing.loader', $slipEntry->id) }}" method="POST">
                                @csrf
-                               @method('PUT')
+                           
 
                                <div class="card-body text-bold">
 

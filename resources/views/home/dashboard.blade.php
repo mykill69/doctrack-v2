@@ -31,7 +31,9 @@
                                             <th>FILE NAME</th>
                                             <th>UPDATED DATE / BY</th>
                                             {{-- <th>TOTAL DURATION</th> --}}
-                                            <th>ACTION</th>
+                                            @if (in_array(auth()->user()->role, ['records_officer', 'administrator']))
+                                                <th>ACTION</th>
+                                            @endif
                                         </tr>
                                     </thead>
 
@@ -123,17 +125,16 @@
                                                         —
                                                     @endif
                                                 </td> --}}
-                                                <td>
-                                                    <div class="buttons">
-
-                                                        <a href="{{ route('editRecall', ['id' => $log->id]) }}"
-                                                            class="btn btn-icon btn-info edit-slip-btn" target="_blank"><span>Recall Document</span> <i
-                                                                class="fas fa-undo-alt"></i>
-                                                        </a>
-
-                                                       
-                                                    </div>
-                                                </td>
+                                                @if (in_array(auth()->user()->role, ['records_officer', 'administrator']))
+                                                    <td>
+                                                        <div class="buttons">
+                                                            <a href="{{ route('editRecall', ['id' => $log->id]) }}"
+                                                                class="btn btn-icon btn-info edit-slip-btn" target="_blank">
+                                                                <span>Recall</span> <i class="fas fa-undo-alt"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                @endif
                                             </tr>
                                         @endforeach
                                     </tbody>
