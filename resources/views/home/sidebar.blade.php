@@ -172,9 +172,9 @@
                         <li class="{{ request()->routeIs('routing') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ route('routing') }}">Routed Back To Records</a>
                         </li>
-                        <li class="{{ request()->routeIs('routingPending') ? 'active show' : '' }}">
+                        {{-- <li class="{{ request()->routeIs('routingPending') ? 'active show' : '' }}">
                             <a class="nav-link" href="{{ route('routingPending') }}">Pending Route</a>
-                        </li>
+                        </li> --}}
                     </ul>
                 </li>
 
