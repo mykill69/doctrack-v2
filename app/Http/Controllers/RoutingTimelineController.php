@@ -71,6 +71,31 @@ public function searchTimeline(Request $request)
     ]);
 }
 
+// this was updated for the re-open function date 3-31-26
+
+// public function acknowledgeLog(Request $request)
+// {
+//     $logId = $request->log_id;
+//     $userId = auth()->id();
+
+//     // Find the log
+//     $log = LogsTrans::findOrFail($logId);
+
+//     // Update trans_status
+//     $log->trans_status = 3;
+//     $log->save();
+
+//     LogsRoute::create([
+//         'slip_id'     => $log->slip_id,
+//         'rslip_id'    => $log->rslip_id,
+//         'log_creator' => $userId,
+//         'log_action'  => 'Acknowledged the document',
+//         'file'        => $log->file,
+//         'routed_users'=> null,
+//     ]);
+
+//     return response()->json(['success' => true, 'message' => 'Document acknowledged']);
+// }
 public function acknowledgeLog(Request $request)
 {
     $logId = $request->log_id;
@@ -79,21 +104,35 @@ public function acknowledgeLog(Request $request)
     // Find the log
     $log = LogsTrans::findOrFail($logId);
 
+    // Determine status (default = 3 if not provided)
+    $status = $request->status_update ?? 3;
+
     // Update trans_status
-    $log->trans_status = 3;
+    $log->trans_status = $status;
     $log->save();
+
+    // Dynamic action message
+    $actionText = ($status == 3)
+        ? 'Acknowledged the document'
+        : 'Re-opened the transaction';
 
     LogsRoute::create([
         'slip_id'     => $log->slip_id,
         'rslip_id'    => $log->rslip_id,
         'log_creator' => $userId,
-        'log_action'  => 'Acknowledged the document',
+        'log_action'  => $actionText,
         'file'        => $log->file,
         'routed_users'=> null,
     ]);
 
-    return response()->json(['success' => true, 'message' => 'Document acknowledged']);
+    return response()->json([
+        'success' => true,
+        'message' => $status == 3
+            ? 'Document acknowledged'
+            : 'Transaction re-opened'
+    ]);
 }
+
 
 public function rerouteLog(Request $request)
 {

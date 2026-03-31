@@ -186,7 +186,7 @@
 
                                                                         <hr>
                                                                         {{-- Action Buttons --}}
-                                                                        @if ($log->trans_status == 3)
+                                                                        {{-- @if ($log->trans_status == 3)
                                                                             <button class="btn btn-success btn-md"
                                                                                 disabled>This Document Has Been
                                                                                 Acknowledged</button>
@@ -210,6 +210,71 @@
                                                                                     aria-expanded="false"
                                                                                     @if ($isDisabled) disabled @endif>Select
                                                                                     Option</button>
+                                                                                <div class="dropdown-menu"
+                                                                                    aria-labelledby="actionsDropdown{{ $log->id }}">
+                                                                                    <a href="javascript:void(0);"
+                                                                                        class="dropdown-item swal-acknowledge"
+                                                                                        data-log-id="{{ $log->id }}">Acknowledge</a>
+                                                                                    <a href="javascript:void(0);"
+                                                                                        class="dropdown-item swal-reroute"
+                                                                                        data-log-id="{{ $log->id }}"
+                                                                                        data-slip-id="{{ $log->slip_id }}">Re-route</a>
+                                                                                </div>
+                                                                            </div>
+                                                                        @endif
+                                                                        @if (auth()->id() == 56)
+                                                                            <button type="button"
+                                                                                class="btn btn-danger btn-md btnReopen"
+                                                                                data-doc-id="{{ $log->doc_id }}"
+                                                                                data-log-id="{{ $log->id }}"
+                                                                                data-route-id="{{ $log->route_id }}"
+                                                                                data-user-id="{{ $log->user_id }}">
+                                                                                <i class="fas fa-undo"></i> Re-open
+                                                                            </button>
+                                                                        @endif --}}
+
+                                                                        {{-- Action Buttons --}}
+                                                                        @if ($log->trans_status == 3)
+                                                                            <div class="d-flex align-items-center gap-2">
+                                                                                <button class="btn btn-success btn-md"
+                                                                                    disabled>
+                                                                                    This Document Has Been Acknowledged
+                                                                                </button>
+
+                                                                                @if (auth()->id() == 56)
+                                                                                    <button type="button"
+                                                                                        class="btn btn-danger btn-md ml-4 btnReopen"
+                                                                                        data-doc-id="{{ $log->doc_id }}"
+                                                                                        data-log-id="{{ $log->id }}"
+                                                                                        data-route-id="{{ $log->route_id }}"
+                                                                                        data-user-id="{{ $log->user_id }}">
+                                                                                        <i class="fas fa-undo"></i> Re-open
+                                                                                    </button>
+                                                                                @endif
+                                                                            </div>
+                                                                        @elseif($log->trans_status == 1 && $log->transaction_type == 2)
+                                                                            <button
+                                                                                class="btn btn-primary btn-md swal-acknowledge"
+                                                                                data-log-id="{{ $log->id }}"
+                                                                                @if ($isDisabled) disabled @endif>
+                                                                                Acknowledge
+                                                                            </button>
+                                                                        @elseif($log->trans_status == 2)
+                                                                            <button class="btn btn-warning btn-md" disabled>
+                                                                                This Document Has Been Re-routed
+                                                                            </button>
+                                                                        @else
+                                                                            <div class="dropdown mt-1">
+                                                                                <button
+                                                                                    class="btn btn-info btn-md dropdown-toggle"
+                                                                                    type="button"
+                                                                                    id="actionsDropdown{{ $log->id }}"
+                                                                                    data-toggle="dropdown"
+                                                                                    aria-haspopup="true"
+                                                                                    aria-expanded="false"
+                                                                                    @if ($isDisabled) disabled @endif>
+                                                                                    Select Option
+                                                                                </button>
                                                                                 <div class="dropdown-menu"
                                                                                     aria-labelledby="actionsDropdown{{ $log->id }}">
                                                                                     <a href="javascript:void(0);"
@@ -293,7 +358,6 @@
                                                 </table>
                                             </div>
                                         </div>
-                                  
                                     @endif
                                 </div>
 
@@ -314,66 +378,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-
     {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const ackButtons = document.querySelectorAll('.swal-acknowledge');
-
-            ackButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const logId = this.dataset.logId;
-
-                    Swal.fire({
-                        title: 'Do you confirm to acknowledge this routing?',
-                        icon: 'info',
-                        html: `
-                    <button id="ackBtn${logId}" class="btn btn-primary">I acknowledge this document</button>
-                `,
-                        showConfirmButton: false,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        position: 'center',
-                    });
-
-                    // Wait for SweetAlert to render, then attach click event
-                    document.getElementById(`ackBtn${logId}`).addEventListener('click', function() {
-
-                        // Axios POST request
-                        axios.post('{{ route('acknowledgeLog') }}', {
-                                log_id: logId,
-                                slip_id: slipId, // 👈 PASS IT
-                                routed_to: routedTo,
-                                comments: comments
-                            }, {
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                }
-                            })
-                            .then(res => {
-                                if (res.data.success) {
-                                    Swal.fire({
-                                        title: 'Acknowledged!',
-                                        icon: 'success',
-                                        timer: 1500,
-                                        showConfirmButton: false
-                                    }).then(() => {
-                                        location
-                                            .reload(); // reload to update timeline
-                                    });
-                                }
-                            })
-                            .catch(err => {
-                                Swal.fire('Error!', 'Something went wrong.', 'error');
-                                console.error(err);
-                            });
-
-                    });
-
-                });
-            });
-        });
-    </script> --}}
-    <script>
         document.addEventListener('DOMContentLoaded', function() {
 
             document.querySelectorAll('.swal-acknowledge').forEach(button => {
@@ -424,6 +429,109 @@
                         });
                 });
             });
+        });
+    </script> --}}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // =========================
+            // ✅ ACKNOWLEDGE
+            // =========================
+            document.querySelectorAll('.swal-acknowledge').forEach(button => {
+
+                button.addEventListener('click', function() {
+
+                    const logId = this.dataset.logId;
+
+                    Swal.fire({
+                        title: 'Confirm Acknowledgement',
+                        icon: 'info',
+                        html: `
+                    <button id="ackBtn${logId}" class="btn btn-primary">
+                        I acknowledge this document
+                    </button>
+                `,
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                    });
+
+                    document
+                        .getElementById(`ackBtn${logId}`)
+                        .addEventListener('click', function() {
+
+                            axios.post('{{ route('acknowledgeLog') }}', {
+                                    log_id: logId
+                                }, {
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    }
+                                })
+                                .then(res => {
+                                    if (res.data.success) {
+                                        Swal.fire({
+                                            title: 'Acknowledged!',
+                                            icon: 'success',
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        }).then(() => location.reload());
+                                    }
+                                })
+                                .catch(err => {
+                                    Swal.fire('Error!', 'Something went wrong.', 'error');
+                                    console.error(err);
+                                });
+
+                        });
+                });
+            });
+
+            // =========================
+            // ✅ RE-OPEN (ADDED HERE)
+            // =========================
+            $(document).on('click', '.btnReopen', function() {
+
+                const logId = $(this).data('log-id');
+
+                if (!logId) return;
+
+                Swal.fire({
+                    title: 'Re-open Transaction',
+                    text: 'Do you wish to re-open this transaction?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Re-open',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        axios.post('{{ route('acknowledgeLog') }}', {
+                                log_id: logId,
+                                status_update: 1 // ✅ triggers re-open
+                            }, {
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                }
+                            })
+                            .then(res => {
+                                if (res.data.success) {
+                                    Swal.fire({
+                                        title: 'Re-opened Successfully!',
+                                        icon: 'success',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    }).then(() => location.reload());
+                                }
+                            })
+                            .catch(err => {
+                                Swal.fire('Error!', 'Something went wrong.', 'error');
+                                console.error(err);
+                            });
+                    }
+                });
+            });
+
         });
     </script>
 

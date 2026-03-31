@@ -4,13 +4,15 @@
 <div class="main-content text-center">
     <div style="margin-top:150px;">
         <i class="fas fa-spinner fa-spin" style="font-size:50px;"></i>
-        <h3 class="mt-3">Processing Inter-Office Transaction...</h3>
+        <h3 class="mt-3">Processing Routing Transaction...</h3>
         <p>Please wait, do not refresh.</p>
     </div>
 </div>
 
-<form id="processForm" method="POST" action="{{ route('storeInterOffice') }}" enctype="multipart/form-data">
+<form id="processForm" method="POST" action="{{ route('updateRoutingEntry', $slipEntry->id) }}" enctype="multipart/form-data">
     @csrf
+    @method('PUT')
+
     @foreach(request()->all() as $key => $value)
         @if(is_array($value))
             @foreach($value as $v)
