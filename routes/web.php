@@ -10,6 +10,7 @@ use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\InterOfficeController;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\EnduserController;
+use App\Http\Controllers\SSOController;
 
 use Illuminate\Http\Request;
 
@@ -24,6 +25,10 @@ use Illuminate\Http\Request;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+// SSO Auto-Login from CPSU KonekTa
+Route::get('/sso/konekta', [SSOController::class, 'konektaLogin'])
+    ->name('sso.konekta');
 
 Route::group(['middleware'=>['guest']],function(){
     Route::get('/', function () {
