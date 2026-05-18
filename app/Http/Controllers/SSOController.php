@@ -5,34 +5,19 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
-use App\Models\SystemLog;
-use Jenssegers\Agent\Agent;
 
 class SSOController extends Controller
 {
-    private function getUserIp(Request $request)
-    {
-        $ip = $request->server('HTTP_CLIENT_IP')
-            ?? $request->server('HTTP_X_FORWARDED_FOR')
-            ?? $request->server('REMOTE_ADDR');
-
-        if ($ip === '::1' || $ip === '127.0.0.1') {
-            $ip = gethostbyname(gethostname());
-        }
-
-        return $ip;
-    }
-
     public function konektaLogin(Request $request)
     {
         $email = $request->get('email');
         $token = $request->get('sso_token');
         $timestamp = $request->get('timestamp');
 
-        // Validate parameters exist
+        // Validate parameters
         if (!$email || !$token || !$timestamp) {
             return redirect()->route('getLogin')
-                ->with('error', 'Invalid SSO request. Missing parameters.');
+                ->with('error', 'Invalid SSO request.');
         }
 
         // Decode the token
@@ -47,13 +32,13 @@ class SSOController extends Controller
         // Verify email matches
         if ($tokenData['email'] !== $email) {
             return redirect()->route('getLogin')
-                ->with('error', 'SSO token email mismatch.');
+                ->with('error', 'Email mismatch.');
         }
 
         // Check token expiry (5 minutes)
         if (time() - $timestamp > 300) {
             return redirect()->route('getLogin')
-                ->with('error', 'SSO token expired. Please login again.');
+                ->with('error', 'SSO token expired.');
         }
 
         // Find user by email
@@ -61,23 +46,19 @@ class SSOController extends Controller
 
         if (!$user) {
             return redirect()->route('getLogin')
-                ->with('error', 'Your email is not registered in DocTrack. Contact MIS Office.');
+                ->with('error', 'Email not registered in SNow. Contact MIS Office.');
         }
 
         // Login the user
-        Auth::login($user);
+        Auth::guard('web')->login($user);
 
-        // Log the SSO login
-        $agent = new Agent();
-        SystemLog::create([
-            'user_id' => $user->id,
-            'action' => 'SSO Login via KonekTa',
-            'ip_address' => $this->getUserIp($request),
-            'user_agent' => $agent->platform() . ' - ' . $agent->browser() . ' ' . $agent->version($agent->browser()),
-        ]);
-
-        // Redirect to dashboard
-        return redirect()->route('dashboard')
-            ->with('success', 'Logged in via CPSU KonekTa SSO! Welcome, ' . $user->fname . '!');
+        // Redirect based on role
+        if ($user->role === 'Administrator') {
+            return redirect()->route('dashboard')
+                ->with('success', 'Logged in via CPSU KonekTa SSO!');
+        } else {
+            return redirect()->route('home')
+                ->with('success', 'Logged in via CPSU KonekTa SSO!');
+        }
     }
 }
